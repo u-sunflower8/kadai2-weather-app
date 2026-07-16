@@ -1,36 +1,41 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 天気予報アプリ
 
-## Getting Started
+OpenWeatherMap API と連携した天気予報 Web アプリです。都市名検索または現在地から、気温・天気・湿度・降水確率を表示し、カレンダーで日付を選んで予報を切り替えられます（無料 API プランのため今日から5日先まで）。
 
-First, run the development server:
+## セットアップ
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+1. [OpenWeatherMap](https://openweathermap.org/api) で無料アカウントを作成し、API キーを取得する
+   - 使用エンドポイント: Geocoding API / Current Weather Data / 5 Day 3 Hour Forecast（すべて無料枠）
+2. `.env.local.example` を `.env.local` にコピーし、取得した API キーを設定する
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+   ```bash
+   cp .env.local.example .env.local
+   ```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. 依存関係をインストールして開発サーバーを起動する
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+   ```bash
+   npm install
+   npm run dev
+   ```
 
-## Learn More
+4. http://localhost:3000 を開く
 
-To learn more about Next.js, take a look at the following resources:
+## 環境変数
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| 変数名 | 説明 |
+| --- | --- |
+| `OPENWEATHER_API_KEY` | OpenWeatherMap の API キー。サーバー側 (Route Handler) でのみ使用し、クライアントには公開しない。 |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## デプロイ (Vercel)
 
-## Deploy on Vercel
+1. GitHub にリポジトリを push
+2. Vercel でプロジェクトをインポート
+3. Vercel の Project Settings > Environment Variables に `OPENWEATHER_API_KEY` を設定
+4. デプロイ
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 技術構成
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Next.js (App Router) + TypeScript
+- Tailwind CSS
+- `/api/weather` Route Handler が OpenWeatherMap API キーをサーバー側で保持し、クライアントに直接キーを渡さない構成
