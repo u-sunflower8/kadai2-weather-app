@@ -71,15 +71,24 @@ export async function GET(request: NextRequest) {
       country = reverse[0]?.country ?? "";
     } else if (city) {
       const geo = await fetchOwmJson<GeoResult[]>(
-        `${OWM_BASE}/geo/1.0/direct?q=${encodeURIComponent(city)}&limit=1&appid=${apiKey}`
+        `${OWM_BASE}/geo/1.0/direct?q=${encodeURIComponent(city)}&limit=5&appid=${apiKey}`
       );
       if (!geo.length) {
         throw new ApiError(`都市が見つかりませんでした: ${city}`, 404);
       }
-      latitude = geo[0].lat;
-      longitude = geo[0].lon;
-      locationName = geo[0].local_names?.ja ?? geo[0].name;
-      country = geo[0].country;
+      // OpenWeatherMap のジオコーディングは関連度順とは限らないため、
+      // 入力と完全一致する候補があればそれを優先する（例: "Osaka" が Orsk(ロシア) より先に来ることがある）
+      const normalized = city.toLowerCase();
+      const best =
+        geo.find(
+          (g) =>
+            g.name.toLowerCase() === normalized ||
+            Object.values(g.local_names ?? {}).some((n) => n.toLowerCase() === normalized)
+        ) ?? geo[0];
+      latitude = best.lat;
+      longitude = best.lon;
+      locationName = best.local_names?.ja ?? best.name;
+      country = best.country;
     } else {
       throw new ApiError("都市名 (city) または緯度経度 (lat, lon) を指定してください。", 400);
     }
