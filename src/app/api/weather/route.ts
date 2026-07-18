@@ -2,11 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import {
   aggregateDay,
   bucketByLocalDate,
+  formatLocalTime,
   type GeoResult,
   type OwmCurrentResponse,
   type OwmForecastResponse,
   type WeatherApiResponse,
 } from "@/lib/weather";
+import { calculatePhotographyScores, type PhotographyInputs } from "@/lib/photography";
 
 export const dynamic = "force-dynamic";
 
@@ -113,6 +115,27 @@ export async function GET(request: NextRequest) {
 
     const isToday = targetDate === todayDate;
 
+    const sunriseUnix = isToday ? current.sys.sunrise : forecast.city.sunrise;
+    const sunsetUnix = isToday ? current.sys.sunset : forecast.city.sunset;
+
+    const photographyInputs: PhotographyInputs = isToday
+      ? {
+          cloudCoverPercent: current.clouds?.all ?? 50,
+          rainProbabilityPercent: day?.pop ?? 0,
+          humidityPercent: current.main.humidity,
+          windSpeedMs: current.wind?.speed ?? 0,
+          visibilityMeters: current.visibility ?? 10000,
+          temperatureC: current.main.temp,
+        }
+      : {
+          cloudCoverPercent: day?.cloudCoverAvg ?? 50,
+          rainProbabilityPercent: day?.pop ?? 0,
+          humidityPercent: day?.humidityAvg ?? 60,
+          windSpeedMs: day?.windSpeedMax ?? 0,
+          visibilityMeters: day?.visibilityMin ?? 10000,
+          temperatureC: day?.tempAvg ?? current.main.temp,
+        };
+
     const payload: WeatherApiResponse = {
       location: {
         name: locationName,
@@ -127,6 +150,9 @@ export async function GET(request: NextRequest) {
             temp: current.main.temp,
             feelsLike: current.main.feels_like,
             humidity: current.main.humidity,
+            cloudCover: current.clouds?.all ?? 50,
+            windSpeed: current.wind?.speed ?? 0,
+            visibility: current.visibility ?? 10000,
             weatherMain: current.weather[0]?.main ?? "",
             weatherDescription: current.weather[0]?.description ?? "",
             icon: current.weather[0]?.icon ?? "01d",
@@ -134,6 +160,10 @@ export async function GET(request: NextRequest) {
         : null,
       day,
       availableDates,
+      sunrise: sunriseUnix ? formatLocalTime(sunriseUnix, tzOffset) : null,
+      sunset: sunsetUnix ? formatLocalTime(sunsetUnix, tzOffset) : null,
+      uvIndex: null,
+      photography: calculatePhotographyScores(photographyInputs),
     };
 
     return NextResponse.json(payload);
