@@ -20,12 +20,12 @@ function barColor(score: number): string {
 
 function ScoreCard({ icon, title, condition }: { icon: string; title: string; condition: PhotoCondition }) {
   return (
-    <div className="flex flex-col gap-2 rounded-lg border border-black/10 bg-white/60 p-4 dark:border-white/10 dark:bg-white/5">
+    <div className="flex flex-col gap-1.5 rounded-lg border border-black/10 bg-white/60 p-3 dark:border-white/10 dark:bg-white/5">
       <div className="flex items-center justify-between gap-2">
         <span className="text-sm font-medium text-slate-800 dark:text-slate-100">
           {icon} {title}
         </span>
-        <span className="text-lg font-bold text-slate-800 dark:text-slate-100">
+        <span className="text-base font-bold text-slate-800 dark:text-slate-100">
           {condition.score}
           <span className="text-xs font-normal text-black/50 dark:text-white/50">/100</span>
         </span>
@@ -51,14 +51,14 @@ function ScoreCard({ icon, title, condition }: { icon: string; title: string; co
 
 export default function PhotographyScores({ scores, date }: PhotographyScoresProps) {
   return (
-    <section className="w-full max-w-3xl rounded-xl border border-black/10 bg-white/70 p-6 shadow-sm dark:border-white/10 dark:bg-white/5">
-      <div className="mb-4 flex items-baseline justify-between">
+    <section className="flex h-full w-full flex-col rounded-xl border border-black/10 bg-white/70 p-4 shadow-sm dark:border-white/10 dark:bg-white/5">
+      <div className="mb-3 flex items-baseline justify-between">
         <h2 className="text-base font-semibold text-slate-800 dark:text-slate-100">
           今日の撮影指数
         </h2>
         <span className="text-xs text-black/50 dark:text-white/50">{date}</span>
       </div>
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+      <div className="grid min-h-0 flex-1 grid-cols-1 gap-2 overflow-y-auto">
         {ITEMS.map((item) => (
           <ScoreCard key={item.key} icon={item.icon} title={item.title} condition={scores[item.key]} />
         ))}

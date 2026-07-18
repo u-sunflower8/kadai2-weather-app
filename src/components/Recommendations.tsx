@@ -48,8 +48,8 @@ export default function Recommendations({ weather }: RecommendationsProps) {
   }, [weather]);
 
   return (
-    <section className="w-full max-w-3xl rounded-xl border border-black/10 bg-white/70 p-6 shadow-sm dark:border-white/10 dark:bg-white/5">
-      <h2 className="mb-4 text-base font-semibold text-slate-800 dark:text-slate-100">
+    <section className="flex h-full w-full flex-col rounded-xl border border-black/10 bg-white/70 p-4 shadow-sm dark:border-white/10 dark:bg-white/5">
+      <h2 className="mb-3 text-base font-semibold text-slate-800 dark:text-slate-100">
         今日のおすすめ
       </h2>
 
@@ -58,19 +58,21 @@ export default function Recommendations({ weather }: RecommendationsProps) {
       )}
 
       {!loading && result && (
-        <div className="flex flex-col gap-4">
+        <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto">
           <p className="text-sm text-black/70 dark:text-white/70">{result.summary}</p>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+          <div className="grid grid-cols-1 gap-2">
             {result.recommendations.map((rec, i) => (
               <div
                 key={i}
-                className="flex flex-col gap-1 rounded-lg border border-black/10 bg-white/60 p-4 dark:border-white/10 dark:bg-white/5"
+                className="flex items-start gap-2 rounded-lg border border-black/10 bg-white/60 p-3 dark:border-white/10 dark:bg-white/5"
               >
-                <span className="text-2xl">{rec.icon}</span>
-                <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">
-                  {rec.title}
-                </p>
-                <p className="text-xs text-black/60 dark:text-white/60">{rec.reason}</p>
+                <span className="text-xl leading-none">{rec.icon}</span>
+                <div>
+                  <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">
+                    {rec.title}
+                  </p>
+                  <p className="text-xs text-black/60 dark:text-white/60">{rec.reason}</p>
+                </div>
               </div>
             ))}
           </div>

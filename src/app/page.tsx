@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
-import Calendar from "@/components/Calendar";
+import DateSelect from "@/components/DateSelect";
 import PhotographyScores from "@/components/PhotographyScores";
 import Recommendations from "@/components/Recommendations";
 import type { WeatherApiResponse } from "@/lib/weather";
@@ -165,39 +165,41 @@ export default function Home() {
     : false;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-sky-50 to-white px-4 py-10 dark:from-slate-950 dark:to-slate-900">
-      <main className="mx-auto flex max-w-3xl flex-col items-center gap-8">
-        <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">
+    <div className="flex min-h-screen flex-col bg-gradient-to-b from-sky-50 to-white px-4 py-4 dark:from-slate-950 dark:to-slate-900 md:h-screen md:overflow-hidden">
+      <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-3 md:min-h-0">
+        <h1 className="text-center text-xl font-bold text-slate-800 dark:text-slate-100">
           天気予報アプリ
         </h1>
 
-        <form onSubmit={handleSearchSubmit} className="flex w-full max-w-sm gap-2">
-          <input
-            type="text"
-            value={cityInput}
-            onChange={(e) => setCityInput(e.target.value)}
-            placeholder="都市名を入力 (例: Tokyo, Osaka)"
-            className="flex-1 rounded-md border border-black/10 bg-white px-3 py-2 text-sm shadow-sm outline-none focus:border-sky-500 dark:border-white/10 dark:bg-slate-800 dark:text-white"
-          />
-          <button
-            type="submit"
-            className="rounded-md bg-sky-600 px-4 py-2 text-sm font-medium text-white hover:bg-sky-700"
-          >
-            検索
-          </button>
-        </form>
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          <form onSubmit={handleSearchSubmit} className="flex gap-2">
+            <input
+              type="text"
+              value={cityInput}
+              onChange={(e) => setCityInput(e.target.value)}
+              placeholder="都市名を入力 (例: Tokyo, Osaka)"
+              className="w-56 rounded-md border border-black/10 bg-white px-3 py-1.5 text-sm shadow-sm outline-none focus:border-sky-500 dark:border-white/10 dark:bg-slate-800 dark:text-white"
+            />
+            <button
+              type="submit"
+              className="rounded-md bg-sky-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-sky-700"
+            >
+              検索
+            </button>
+          </form>
 
-        <button
-          type="button"
-          onClick={handleUseCurrentLocation}
-          disabled={geoLoading}
-          className="text-sm font-medium text-sky-700 underline-offset-2 hover:underline disabled:opacity-50 dark:text-sky-400"
-        >
-          {geoLoading ? "現在地を取得中..." : "📍 現在地の天気を表示"}
-        </button>
+          <button
+            type="button"
+            onClick={handleUseCurrentLocation}
+            disabled={geoLoading}
+            className="text-sm font-medium text-sky-700 underline-offset-2 hover:underline disabled:opacity-50 dark:text-sky-400"
+          >
+            {geoLoading ? "現在地を取得中..." : "📍 現在地の天気を表示"}
+          </button>
+        </div>
 
         {(favorites.length > 0 || favoriteMessage) && (
-          <div className="w-full max-w-sm">
+          <div className="flex flex-col items-center gap-1">
             {favorites.length > 0 && (
               <div className="flex flex-wrap justify-center gap-2">
                 {favorites.map((city) => (
@@ -214,32 +216,32 @@ export default function Home() {
               </div>
             )}
             {favoriteMessage && (
-              <p className="mt-2 text-center text-xs text-amber-600 dark:text-amber-400">
+              <p className="text-center text-xs text-amber-600 dark:text-amber-400">
                 {favoriteMessage}
               </p>
             )}
           </div>
         )}
 
-        <div className="flex w-full flex-col items-center gap-6 md:flex-row md:items-start md:justify-center">
-          <Calendar
-            selectedDate={selectedDate}
-            availableDates={weather?.availableDates ?? []}
-            onSelect={handleSelectDate}
-          />
-
-          <div className="w-full max-w-sm rounded-xl border border-black/10 bg-white/70 p-6 shadow-sm dark:border-white/10 dark:bg-white/5">
+        <div className="grid flex-1 grid-cols-1 gap-4 md:min-h-0 md:grid-cols-3">
+          <div className="flex h-full w-full flex-col rounded-xl border border-black/10 bg-white/70 p-4 shadow-sm dark:border-white/10 dark:bg-white/5">
             {loading && <p className="text-sm text-black/60 dark:text-white/60">読み込み中...</p>}
             {error && !loading && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
             {!loading && !error && weather && (
-              <div className="flex flex-col gap-3">
+              <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto">
                 <div className="flex items-start justify-between gap-2">
                   <div>
                     <p className="text-lg font-semibold text-slate-800 dark:text-slate-100">
                       {weather.location.name}
                       {weather.location.country ? `, ${weather.location.country}` : ""}
                     </p>
-                    <p className="text-sm text-black/50 dark:text-white/50">{weather.date}</p>
+                    <div className="mt-1 flex items-center gap-2">
+                      <DateSelect
+                        selectedDate={selectedDate}
+                        availableDates={weather.availableDates}
+                        onSelect={handleSelectDate}
+                      />
+                    </div>
                   </div>
                   <button
                     type="button"
@@ -257,8 +259,8 @@ export default function Home() {
                     <Image
                       src={`https://openweathermap.org/img/wn/${weather.current.icon}@2x.png`}
                       alt={weather.current.weatherDescription}
-                      width={64}
-                      height={64}
+                      width={56}
+                      height={56}
                     />
                     <div>
                       <p className="text-3xl font-bold text-slate-800 dark:text-slate-100">
@@ -306,14 +308,18 @@ export default function Home() {
                     この日付の予報データはありません。
                   </p>
                 )}
+
+                <p className="mt-auto text-[11px] text-black/40 dark:text-white/40">
+                  ※ 無料 API プランのため、今日から5日先までの日付を選択できます。
+                </p>
               </div>
             )}
           </div>
+
+          {weather && <Recommendations weather={weather} />}
+
+          {weather && <PhotographyScores scores={weather.photography} date={weather.date} />}
         </div>
-
-        {weather && <Recommendations weather={weather} />}
-
-        {weather && <PhotographyScores scores={weather.photography} date={weather.date} />}
       </main>
     </div>
   );
