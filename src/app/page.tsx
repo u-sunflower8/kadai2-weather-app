@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
 import Calendar from "@/components/Calendar";
 import PhotographyScores from "@/components/PhotographyScores";
+import Recommendations from "@/components/Recommendations";
 import type { WeatherApiResponse } from "@/lib/weather";
 import {
   MAX_FAVORITE_CITIES,
@@ -309,6 +310,8 @@ export default function Home() {
             )}
           </div>
         </div>
+
+        {weather && <Recommendations weather={weather} />}
 
         {weather && <PhotographyScores scores={weather.photography} date={weather.date} />}
       </main>
